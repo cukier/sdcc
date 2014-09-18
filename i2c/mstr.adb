@@ -1,0 +1,12 @@
+M:mstr
+F:G$I2C_Send$0$0({2}DF,SC:S),Z,0,0,0,0,0
+F:G$I2C_Read$0$0({2}DF,SC:S),Z,0,0,0,0,0
+F:G$i2csendbyte$0$0({2}DF,SC:S),Z,0,0,0,0,0
+F:G$i2cgetbyte$0$0({2}DF,SC:S),Z,0,0,0,0,0
+F:G$i2cstart$0$0({2}DF,SV:S),Z,0,0,0,0,0
+F:G$i2cstop$0$0({2}DF,SV:S),Z,0,0,0,0,0
+F:G$i2cclock$0$0({2}DF,SV:S),Z,0,0,0,0,0
+F:G$i2creadbit$0$0({2}DF,SC:S),Z,0,0,0,0,0
+F:G$i2cgetack$0$0({2}DF,SC:S),Z,0,0,0,0,0
+F:G$i2csendack$0$0({2}DF,SV:S),Z,0,0,0,0,0
+F:G$i2cdelay$0$0({2}DF,SV:S),Z,0,0,0,0,0

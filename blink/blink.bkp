@@ -1,0 +1,36 @@
+#include <pic16f876a.h>
+
+code char at __CONFIG1H CONFIG1H = _OSC_HS_1H;
+
+unsigned int i;
+
+void TMR0_ISR(void) interrupt 0 {
+	i++;
+	if(i==500) {
+		PORTB++;
+		i = 0;
+	}
+	INTCONbits.TMR0IF = 0;
+}
+
+void main(void) {
+
+	TRISB = 0x00;
+	PORTB = 0x00;
+
+	TRISD = 0x00;
+	PORTD = 0x00;
+
+	INTCONbits.GIE = 1;
+	INTCONbits.TMR0IE = 1;
+
+	T0CONbits.TMR0ON = 1;
+	T0CONbits.T08BIT = 0;
+	T0CONbits.T0CS = 1;
+	T0CONbits.PSA = 0;
+	T0CONbits.T0PS2 = 1;
+	T0CONbits.T0PS1 = 1;
+	T0CONbits.T0PS0 = 1;
+
+	while(1) { }
+}

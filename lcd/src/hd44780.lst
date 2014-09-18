@@ -1,0 +1,847 @@
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00001 ;--------------------------------------------------------
+               00002 ; File Created by SDCC : free open source ANSI-C Compiler
+               00003 ; Version 2.9.0 #5416 (Feb  3 2010) (UNIX)
+               00004 ; This file was generated Wed Jun  9 16:31:23 2010
+               00005 ;--------------------------------------------------------
+               00006 ; PIC16 port for the Microchip 16-bit core micros
+               00007 ;--------------------------------------------------------
+               00008 
+               00009         .ident "SDCC version 2.9.0 #5416 [pic16 port]"
+               00010         .file   "hd44780.c"
+               00011         list    p=18f452
+               00012 
+               00013         radix dec
+               00014 
+               00015 ;--------------------------------------------------------
+               00016 ; public variables in this module
+               00017 ;--------------------------------------------------------
+               00018         global _lcd_init
+               00019         global _lcd_clear
+               00020         global _lcd_home
+               00021         global _lcd_emode
+               00022         global _lcd_dmode
+               00023         global _lcd_cmode
+               00024         global _lcd_fmode
+               00025         global _lcd_ddram
+               00026         global _send_cmd
+               00027         global _send_data
+               00028         global _lcd_busy
+               00029 
+               00030 ;--------------------------------------------------------
+               00031 ; extern variables in this module
+               00032 ;--------------------------------------------------------
+               00033         extern _PORTAbits
+               00034         extern _PORTBbits
+               00035         extern _PORTCbits
+               00036         extern _PORTDbits
+               00037         extern _PORTEbits
+               00038         extern _LATAbits
+               00039         extern _LATBbits
+               00040         extern _LATCbits
+               00041         extern _LATDbits
+               00042         extern _LATEbits
+               00043         extern _TRISAbits
+               00044         extern _TRISBbits
+               00045         extern _TRISCbits
+               00046         extern _TRISDbits
+               00047         extern _TRISEbits
+               00048         extern _PIE1bits
+               00049         extern _PIR1bits
+               00050         extern _IPR1bits
+               00051         extern _PIE2bits
+               00052         extern _PIR2bits
+               00053         extern _IPR2bits
+               00054         extern _EECON1bits
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00055         extern _RCSTAbits
+               00056         extern _TXSTAbits
+               00057         extern _T3CONbits
+               00058         extern _CCP2CONbits
+               00059         extern _CCP1CONbits
+               00060         extern _ADCON1bits
+               00061         extern _ADCON0bits
+               00062         extern _SSPCON2bits
+               00063         extern _SSPCON1bits
+               00064         extern _SSPSTATbits
+               00065         extern _T2CONbits
+               00066         extern _T1CONbits
+               00067         extern _RCONbits
+               00068         extern _WDTCONbits
+               00069         extern _LVDCONbits
+               00070         extern _OSCCONbits
+               00071         extern _T0CONbits
+               00072         extern _STATUSbits
+               00073         extern _INTCON3bits
+               00074         extern _INTCON2bits
+               00075         extern _INTCONbits
+               00076         extern _STKPTRbits
+               00077         extern _PORTA
+               00078         extern _PORTB
+               00079         extern _PORTC
+               00080         extern _PORTD
+               00081         extern _PORTE
+               00082         extern _LATA
+               00083         extern _LATB
+               00084         extern _LATC
+               00085         extern _LATD
+               00086         extern _LATE
+               00087         extern _TRISA
+               00088         extern _TRISB
+               00089         extern _TRISC
+               00090         extern _TRISD
+               00091         extern _TRISE
+               00092         extern _PIE1
+               00093         extern _PIR1
+               00094         extern _IPR1
+               00095         extern _PIE2
+               00096         extern _PIR2
+               00097         extern _IPR2
+               00098         extern _EECON1
+               00099         extern _EECON2
+               00100         extern _EEDATA
+               00101         extern _EEADR
+               00102         extern _RCSTA
+               00103         extern _TXSTA
+               00104         extern _TXREG
+               00105         extern _RCREG
+               00106         extern _SPBRG
+               00107         extern _T3CON
+               00108         extern _TMR3L
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00109         extern _TMR3H
+               00110         extern _CCP2CON
+               00111         extern _CCPR2L
+               00112         extern _CCPR2H
+               00113         extern _CCP1CON
+               00114         extern _CCPR1L
+               00115         extern _CCPR1H
+               00116         extern _ADCON1
+               00117         extern _ADCON0
+               00118         extern _ADRESL
+               00119         extern _ADRESH
+               00120         extern _SSPCON2
+               00121         extern _SSPCON1
+               00122         extern _SSPSTAT
+               00123         extern _SSPADD
+               00124         extern _SSPBUF
+               00125         extern _T2CON
+               00126         extern _PR2
+               00127         extern _TMR2
+               00128         extern _T1CON
+               00129         extern _TMR1L
+               00130         extern _TMR1H
+               00131         extern _RCON
+               00132         extern _WDTCON
+               00133         extern _LVDCON
+               00134         extern _OSCCON
+               00135         extern _T0CON
+               00136         extern _TMR0L
+               00137         extern _TMR0H
+               00138         extern _STATUS
+               00139         extern _FSR2L
+               00140         extern _FSR2H
+               00141         extern _PLUSW2
+               00142         extern _PREINC2
+               00143         extern _POSTDEC2
+               00144         extern _POSTINC2
+               00145         extern _INDF2
+               00146         extern _BSR
+               00147         extern _FSR1L
+               00148         extern _FSR1H
+               00149         extern _PLUSW1
+               00150         extern _PREINC1
+               00151         extern _POSTDEC1
+               00152         extern _POSTINC1
+               00153         extern _INDF1
+               00154         extern _WREG
+               00155         extern _FSR0L
+               00156         extern _FSR0H
+               00157         extern _PLUSW0
+               00158         extern _PREINC0
+               00159         extern _POSTDEC0
+               00160         extern _POSTINC0
+               00161         extern _INDF0
+               00162         extern _INTCON3
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00163         extern _INTCON2
+               00164         extern _INTCON
+               00165         extern _PRODL
+               00166         extern _PRODH
+               00167         extern _TABLAT
+               00168         extern _TBLPTRL
+               00169         extern _TBLPTRH
+               00170         extern _TBLPTRU
+               00171         extern _PCL
+               00172         extern _PCLATH
+               00173         extern _PCLATU
+               00174         extern _STKPTR
+               00175         extern _TOSL
+               00176         extern _TOSH
+               00177         extern _TOSU
+               00178 ;--------------------------------------------------------
+               00179 ;       Equates to used internal registers
+               00180 ;--------------------------------------------------------
+  00000FD8     00181 STATUS  equ     0xfd8
+  00000FE8     00182 WREG    equ     0xfe8
+  00000FE1     00183 FSR1L   equ     0xfe1
+  00000FD9     00184 FSR2L   equ     0xfd9
+  00000FE5     00185 POSTDEC1        equ     0xfe5
+  00000FE4     00186 PREINC1 equ     0xfe4
+  00000FDB     00187 PLUSW2  equ     0xfdb
+               00188 
+               00189 
+               00190 ; Internal registers
+               00191 .registers      udata_ovr       0x0000
+               00192 r0x00   res     1
+               00193 r0x01   res     1
+               00194 
+               00195 ;--------------------------------------------------------
+               00196 ; global & static initialisations
+               00197 ;--------------------------------------------------------
+               00198 ; I code from now on!
+               00199 ; ; Starting pCode block
+               00200 S_hd44780__lcd_busy     code
+0000 00201 _lcd_busy:
+               00202         .line   258; hd44780.c  char lcd_busy(void)
+0000 CFD9 FFE5 00203         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00204         MOVFF   FSR1L, FSR2L
+0008 C000 FFE5 00205         MOVFF   r0x00, POSTDEC1
+000C C000 FFE5 00206         MOVFF   r0x01, POSTDEC1
+               00207         .line   264; hd44780.c  LCD_DATA_TRIS = 0xFF;
+0010 0EFF      00208         MOVLW   0xff
+0012 6E00      00209         MOVWF   _TRISD
+               00210         .line   266; hd44780.c  LCD_DATA = 0x00;
+0014 6A00      00211         CLRF    _PORTD
+               00212         .line   270; hd44780.c  LCD_RS = 0;
+0016 9000      00213         BCF     _PORTEbits, 0
+               00214         .line   272; hd44780.c  LCD_ENABLE = 1;
+0018 8200      00215         BSF     _PORTEbits, 1
+               00216         .line   277; hd44780.c  while(loop < 20){
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+001A 6A00      00217         CLRF    r0x00
+001C 6A00      00218         CLRF    r0x01
+001E 00219 _00193_DS_:
+001E 5000      00220         MOVF    r0x01, W
+0020 0F80      00221         ADDLW   0x80
+0022 0F80      00222         ADDLW   0x80
+0024 E100      00223         BNZ     _00205_DS_
+0026 0E14      00224         MOVLW   0x14
+0028 5C00      00225         SUBWF   r0x00, W
+002A 00226 _00205_DS_:
+002A E200      00227         BC      _00195_DS_
+               00228         .line   278; hd44780.c  loop++;
+002C 2A00      00229         INCF    r0x00, F
+002E B0D8      00230         BTFSC   STATUS, 0
+0030 2A00      00231         INCF    r0x01, F
+0032 D000      00232         BRA     _00193_DS_
+0034 00233 _00195_DS_:
+               00234         .line   281; hd44780.c  dataval = LCD_DATA;
+0034 C000 F000 00235         MOVFF   _PORTD, r0x00
+               00236         .line   283; hd44780.c  LCD_ENABLE = 0;
+0038 9200      00237         BCF     _PORTEbits, 1
+               00238         .line   286; hd44780.c  dataval = dataval & 0x80;
+003A 0E80      00239         MOVLW   0x80
+003C 1600      00240         ANDWF   r0x00, F
+               00241         .line   287; hd44780.c  if(dataval == 0x80){
+003E 5000      00242         MOVF    r0x00, W
+0040 0A80      00243         XORLW   0x80
+0042 E100      00244         BNZ     _00197_DS_
+               00245         .line   289; hd44780.c  LCD_DATA_TRIS = 0x00;
+0044 6A00      00246         CLRF    _TRISD
+               00247         .line   290; hd44780.c  return(1);
+0046 0E01      00248         MOVLW   0x01
+0048 D000      00249         BRA     _00199_DS_
+004A 00250 _00197_DS_:
+               00251         .line   295; hd44780.c  LCD_DATA_TRIS = 0x00;
+004A 6A00      00252         CLRF    _TRISD
+               00253         .line   296; hd44780.c  return(0);
+004C 6AE8      00254         CLRF    WREG
+004E 00255 _00199_DS_:
+004E CFE4 F000 00256         MOVFF   PREINC1, r0x01
+0052 CFE4 F000 00257         MOVFF   PREINC1, r0x00
+0056 CFE4 FFD9 00258         MOVFF   PREINC1, FSR2L
+005A 0012      00259         RETURN  
+               00260 
+               00261 ; ; Starting pCode block
+               00262 S_hd44780__send_data    code
+0000 00263 _send_data:
+               00264         .line   222; hd44780.c  void send_data(unsigned char dataval)
+0000 CFD9 FFE5 00265         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00266         MOVFF   FSR1L, FSR2L
+0008 C000 FFE5 00267         MOVFF   r0x00, POSTDEC1
+000C C000 FFE5 00268         MOVFF   r0x01, POSTDEC1
+0010 0E02      00269         MOVLW   0x02
+0012 CFDB F000 00270         MOVFF   PLUSW2, r0x00
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0016 00271 _00173_DS_:
+               00272         .line   227; hd44780.c  while(lcd_busy() == 1);
+0016 EC00 F000 00273         CALL    _lcd_busy
+001A 6E00      00274         MOVWF   r0x01
+001C 5000      00275         MOVF    r0x01, W
+001E 0A01      00276         XORLW   0x01
+0020 E000      00277         BZ      _00173_DS_
+               00278         .line   230; hd44780.c  LCD_DATA_TRIS = 0x00;
+0022 6A00      00279         CLRF    _TRISD
+               00280         .line   234; hd44780.c  LCD_RS = 1;
+0024 8000      00281         BSF     _PORTEbits, 0
+               00282         .line   236; hd44780.c  LCD_DATA = dataval;
+0026 C000 F000 00283         MOVFF   r0x00, _PORTD
+               00284         .line   238; hd44780.c  LCD_ENABLE = 1;
+002A 8200      00285         BSF     _PORTEbits, 1
+               00286         .line   244; hd44780.c  while(loop < 20){
+002C 6A00      00287         CLRF    r0x00
+002E 6A00      00288         CLRF    r0x01
+0030 00289 _00176_DS_:
+0030 5000      00290         MOVF    r0x01, W
+0032 0F80      00291         ADDLW   0x80
+0034 0F80      00292         ADDLW   0x80
+0036 E100      00293         BNZ     _00188_DS_
+0038 0E14      00294         MOVLW   0x14
+003A 5C00      00295         SUBWF   r0x00, W
+003C 00296 _00188_DS_:
+003C E200      00297         BC      _00178_DS_
+               00298         .line   245; hd44780.c  loop++;
+003E 2A00      00299         INCF    r0x00, F
+0040 B0D8      00300         BTFSC   STATUS, 0
+0042 2A00      00301         INCF    r0x01, F
+0044 D000      00302         BRA     _00176_DS_
+0046 00303 _00178_DS_:
+               00304         .line   248; hd44780.c  LCD_ENABLE = 0;
+0046 9200      00305         BCF     _PORTEbits, 1
+0048 CFE4 F000 00306         MOVFF   PREINC1, r0x01
+004C CFE4 F000 00307         MOVFF   PREINC1, r0x00
+0050 CFE4 FFD9 00308         MOVFF   PREINC1, FSR2L
+0054 0012      00309         RETURN  
+               00310 
+               00311 ; ; Starting pCode block
+               00312 S_hd44780__send_cmd     code
+0000 00313 _send_cmd:
+               00314         .line   189; hd44780.c  void send_cmd(unsigned char command)
+0000 CFD9 FFE5 00315         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00316         MOVFF   FSR1L, FSR2L
+0008 C000 FFE5 00317         MOVFF   r0x00, POSTDEC1
+000C C000 FFE5 00318         MOVFF   r0x01, POSTDEC1
+0010 0E02      00319         MOVLW   0x02
+0012 CFDB F000 00320         MOVFF   PLUSW2, r0x00
+0016 00321 _00153_DS_:
+               00322         .line   194; hd44780.c  while(lcd_busy() == 1);
+0016 EC00 F000 00323         CALL    _lcd_busy
+001A 6E00      00324         MOVWF   r0x01
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+001C 5000      00325         MOVF    r0x01, W
+001E 0A01      00326         XORLW   0x01
+0020 E000      00327         BZ      _00153_DS_
+               00328         .line   197; hd44780.c  LCD_DATA_TRIS = 0x00;
+0022 6A00      00329         CLRF    _TRISD
+               00330         .line   201; hd44780.c  LCD_RS = 0;
+0024 9000      00331         BCF     _PORTEbits, 0
+               00332         .line   203; hd44780.c  LCD_DATA = command;
+0026 C000 F000 00333         MOVFF   r0x00, _PORTD
+               00334         .line   205; hd44780.c  LCD_ENABLE = 1;
+002A 8200      00335         BSF     _PORTEbits, 1
+               00336         .line   211; hd44780.c  while(loop < 20){
+002C 6A00      00337         CLRF    r0x00
+002E 6A00      00338         CLRF    r0x01
+0030 00339 _00156_DS_:
+0030 5000      00340         MOVF    r0x01, W
+0032 0F80      00341         ADDLW   0x80
+0034 0F80      00342         ADDLW   0x80
+0036 E100      00343         BNZ     _00168_DS_
+0038 0E14      00344         MOVLW   0x14
+003A 5C00      00345         SUBWF   r0x00, W
+003C 00346 _00168_DS_:
+003C E200      00347         BC      _00158_DS_
+               00348         .line   212; hd44780.c  loop++;
+003E 2A00      00349         INCF    r0x00, F
+0040 B0D8      00350         BTFSC   STATUS, 0
+0042 2A00      00351         INCF    r0x01, F
+0044 D000      00352         BRA     _00156_DS_
+0046 00353 _00158_DS_:
+               00354         .line   215; hd44780.c  LCD_ENABLE = 0;
+0046 9200      00355         BCF     _PORTEbits, 1
+0048 CFE4 F000 00356         MOVFF   PREINC1, r0x01
+004C CFE4 F000 00357         MOVFF   PREINC1, r0x00
+0050 CFE4 FFD9 00358         MOVFF   PREINC1, FSR2L
+0054 0012      00359         RETURN  
+               00360 
+               00361 ; ; Starting pCode block
+               00362 S_hd44780__lcd_ddram    code
+0000 00363 _lcd_ddram:
+               00364         .line   175; hd44780.c  void lcd_ddram(unsigned char address)
+0000 CFD9 FFE5 00365         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00366         MOVFF   FSR1L, FSR2L
+0008 C000 FFE5 00367         MOVFF   r0x00, POSTDEC1
+000C 0E02      00368         MOVLW   0x02
+000E CFDB F000 00369         MOVFF   PLUSW2, r0x00
+               00370         .line   178; hd44780.c  address = address & 0x7F;
+0012 9E00      00371         BCF     r0x00, 7
+               00372         .line   180; hd44780.c  address = address | 0x80;
+0014 8E00      00373         BSF     r0x00, 7
+               00374         .line   182; hd44780.c  send_cmd(address);
+0016 5000      00375         MOVF    r0x00, W
+0018 6EE5      00376         MOVWF   POSTDEC1
+001A EC00 F000 00377         CALL    _send_cmd
+001E 2AE1      00378         INCF    FSR1L, F
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0020 CFE4 F000 00379         MOVFF   PREINC1, r0x00
+0024 CFE4 FFD9 00380         MOVFF   PREINC1, FSR2L
+0028 0012      00381         RETURN  
+               00382 
+               00383 ; ; Starting pCode block
+               00384 S_hd44780__lcd_fmode    code
+0000 00385 _lcd_fmode:
+               00386         .line   158; hd44780.c  void lcd_fmode(unsigned char options)
+0000 CFD9 FFE5 00387         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00388         MOVFF   FSR1L, FSR2L
+0008 C000 FFE5 00389         MOVFF   r0x00, POSTDEC1
+000C 0E02      00390         MOVLW   0x02
+000E CFDB F000 00391         MOVFF   PLUSW2, r0x00
+               00392         .line   161; hd44780.c  options = options & 0x1F;
+0012 0E1F      00393         MOVLW   0x1f
+0014 1600      00394         ANDWF   r0x00, F
+               00395         .line   163; hd44780.c  options = options | 0x20;
+0016 8A00      00396         BSF     r0x00, 5
+               00397         .line   165; hd44780.c  send_cmd(options);
+0018 5000      00398         MOVF    r0x00, W
+001A 6EE5      00399         MOVWF   POSTDEC1
+001C EC00 F000 00400         CALL    _send_cmd
+0020 2AE1      00401         INCF    FSR1L, F
+0022 CFE4 F000 00402         MOVFF   PREINC1, r0x00
+0026 CFE4 FFD9 00403         MOVFF   PREINC1, FSR2L
+002A 0012      00404         RETURN  
+               00405 
+               00406 ; ; Starting pCode block
+               00407 S_hd44780__lcd_cmode    code
+0000 00408 _lcd_cmode:
+               00409         .line   138; hd44780.c  void lcd_cmode(unsigned char options)
+0000 CFD9 FFE5 00410         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00411         MOVFF   FSR1L, FSR2L
+0008 C000 FFE5 00412         MOVFF   r0x00, POSTDEC1
+000C 0E02      00413         MOVLW   0x02
+000E CFDB F000 00414         MOVFF   PLUSW2, r0x00
+               00415         .line   141; hd44780.c  options = options & 0x0C;
+0012 0E0C      00416         MOVLW   0x0c
+0014 1600      00417         ANDWF   r0x00, F
+               00418         .line   143; hd44780.c  options = options | 0x10;
+0016 8800      00419         BSF     r0x00, 4
+               00420         .line   145; hd44780.c  send_cmd(options);
+0018 5000      00421         MOVF    r0x00, W
+001A 6EE5      00422         MOVWF   POSTDEC1
+001C EC00 F000 00423         CALL    _send_cmd
+0020 2AE1      00424         INCF    FSR1L, F
+0022 CFE4 F000 00425         MOVFF   PREINC1, r0x00
+0026 CFE4 FFD9 00426         MOVFF   PREINC1, FSR2L
+002A 0012      00427         RETURN  
+               00428 
+               00429 ; ; Starting pCode block
+               00430 S_hd44780__lcd_dmode    code
+0000 00431 _lcd_dmode:
+               00432         .line   119; hd44780.c  void lcd_dmode(unsigned char options)
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0000 CFD9 FFE5 00433         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00434         MOVFF   FSR1L, FSR2L
+0008 C000 FFE5 00435         MOVFF   r0x00, POSTDEC1
+000C 0E02      00436         MOVLW   0x02
+000E CFDB F000 00437         MOVFF   PLUSW2, r0x00
+               00438         .line   122; hd44780.c  options = options & 0x07;
+0012 0E07      00439         MOVLW   0x07
+0014 1600      00440         ANDWF   r0x00, F
+               00441         .line   124; hd44780.c  options = options | 0x08;
+0016 8600      00442         BSF     r0x00, 3
+               00443         .line   126; hd44780.c  send_cmd(options);
+0018 5000      00444         MOVF    r0x00, W
+001A 6EE5      00445         MOVWF   POSTDEC1
+001C EC00 F000 00446         CALL    _send_cmd
+0020 2AE1      00447         INCF    FSR1L, F
+0022 CFE4 F000 00448         MOVFF   PREINC1, r0x00
+0026 CFE4 FFD9 00449         MOVFF   PREINC1, FSR2L
+002A 0012      00450         RETURN  
+               00451 
+               00452 ; ; Starting pCode block
+               00453 S_hd44780__lcd_emode    code
+0000 00454 _lcd_emode:
+               00455         .line   99; hd44780.c   void lcd_emode(unsigned char options)
+0000 CFD9 FFE5 00456         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00457         MOVFF   FSR1L, FSR2L
+0008 C000 FFE5 00458         MOVFF   r0x00, POSTDEC1
+000C 0E02      00459         MOVLW   0x02
+000E CFDB F000 00460         MOVFF   PLUSW2, r0x00
+               00461         .line   102; hd44780.c  options = options & 0x03;
+0012 0E03      00462         MOVLW   0x03
+0014 1600      00463         ANDWF   r0x00, F
+               00464         .line   104; hd44780.c  options = options | 0x04;
+0016 8400      00465         BSF     r0x00, 2
+               00466         .line   106; hd44780.c  send_cmd(options);
+0018 5000      00467         MOVF    r0x00, W
+001A 6EE5      00468         MOVWF   POSTDEC1
+001C EC00 F000 00469         CALL    _send_cmd
+0020 2AE1      00470         INCF    FSR1L, F
+0022 CFE4 F000 00471         MOVFF   PREINC1, r0x00
+0026 CFE4 FFD9 00472         MOVFF   PREINC1, FSR2L
+002A 0012      00473         RETURN  
+               00474 
+               00475 ; ; Starting pCode block
+               00476 S_hd44780__lcd_home     code
+0000 00477 _lcd_home:
+               00478         .line   84; hd44780.c   void lcd_home(void)
+0000 CFD9 FFE5 00479         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00480         MOVFF   FSR1L, FSR2L
+               00481         .line   87; hd44780.c   send_cmd(0x02);
+0008 0E02      00482         MOVLW   0x02
+000A 6EE5      00483         MOVWF   POSTDEC1
+000C EC00 F000 00484         CALL    _send_cmd
+0010 2AE1      00485         INCF    FSR1L, F
+0012 CFE4 FFD9 00486         MOVFF   PREINC1, FSR2L
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0016 0012      00487         RETURN  
+               00488 
+               00489 ; ; Starting pCode block
+               00490 S_hd44780__lcd_clear    code
+0000 00491 _lcd_clear:
+               00492         .line   73; hd44780.c   void lcd_clear(void)
+0000 CFD9 FFE5 00493         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00494         MOVFF   FSR1L, FSR2L
+               00495         .line   76; hd44780.c   send_cmd(0x01);
+0008 0E01      00496         MOVLW   0x01
+000A 6EE5      00497         MOVWF   POSTDEC1
+000C EC00 F000 00498         CALL    _send_cmd
+0010 2AE1      00499         INCF    FSR1L, F
+0012 CFE4 FFD9 00500         MOVFF   PREINC1, FSR2L
+0016 0012      00501         RETURN  
+               00502 
+               00503 ; ; Starting pCode block
+               00504 S_hd44780__lcd_init     code
+0000 00505 _lcd_init:
+               00506         .line   32; hd44780.c   void lcd_init(void)
+0000 CFD9 FFE5 00507         MOVFF   FSR2L, POSTDEC1
+0004 CFE1 FFD9 00508         MOVFF   FSR1L, FSR2L
+0008 C000 FFE5 00509         MOVFF   r0x00, POSTDEC1
+000C C000 FFE5 00510         MOVFF   r0x01, POSTDEC1
+               00511         .line   38; hd44780.c   LCD_DATA_TRIS = 0x00;
+0010 6A00      00512         CLRF    _TRISD
+               00513         .line   40; hd44780.c   LCD_DATA = 0x00;
+0012 6A00      00514         CLRF    _PORTD
+               00515         .line   43; hd44780.c   TRISC = 0xF0;
+0014 0EF0      00516         MOVLW   0xf0
+0016 6E00      00517         MOVWF   _TRISC
+               00518         .line   46; hd44780.c   LCD_ENABLE = 0;
+0018 9200      00519         BCF     _PORTEbits, 1
+               00520         .line   48; hd44780.c   LCD_RS = 0;
+001A 9000      00521         BCF     _PORTEbits, 0
+               00522         .line   52; hd44780.c   while(loop < 9000){
+001C 6A00      00523         CLRF    r0x00
+001E 6A00      00524         CLRF    r0x01
+0020 00525 _00105_DS_:
+0020 0E23      00526         MOVLW   0x23
+0022 5C00      00527         SUBWF   r0x01, W
+0024 E100      00528         BNZ     _00113_DS_
+0026 0E28      00529         MOVLW   0x28
+0028 5C00      00530         SUBWF   r0x00, W
+002A 00531 _00113_DS_:
+002A E200      00532         BC      _00107_DS_
+               00533         .line   53; hd44780.c   loop++;
+002C 2A00      00534         INCF    r0x00, F
+002E B0D8      00535         BTFSC   STATUS, 0
+0030 2A00      00536         INCF    r0x01, F
+0032 D000      00537         BRA     _00105_DS_
+0034 00538 _00107_DS_:
+               00539         .line   57; hd44780.c   lcd_clear();
+0034 EC00 F000 00540         CALL    _lcd_clear
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00541         .line   60; hd44780.c   lcd_emode(INC_CURSOR);
+0038 0E02      00542         MOVLW   0x02
+003A 6EE5      00543         MOVWF   POSTDEC1
+003C EC00 F000 00544         CALL    _lcd_emode
+0040 2AE1      00545         INCF    FSR1L, F
+               00546         .line   63; hd44780.c   lcd_fmode(IFACE_8BIT | DUAL_LINE);
+0042 0E18      00547         MOVLW   0x18
+0044 6EE5      00548         MOVWF   POSTDEC1
+0046 EC00 F000 00549         CALL    _lcd_fmode
+004A 2AE1      00550         INCF    FSR1L, F
+               00551         .line   66; hd44780.c   lcd_dmode(DISPLAY_ON);
+004C 0E04      00552         MOVLW   0x04
+004E 6EE5      00553         MOVWF   POSTDEC1
+0050 EC00 F000 00554         CALL    _lcd_dmode
+0054 2AE1      00555         INCF    FSR1L, F
+0056 CFE4 F000 00556         MOVFF   PREINC1, r0x01
+005A CFE4 F000 00557         MOVFF   PREINC1, r0x00
+005E CFE4 FFD9 00558         MOVFF   PREINC1, FSR2L
+0062 0012      00559         RETURN  
+               00560 
+               00561 
+               00562 
+               00563 ; Statistics:
+               00564 ; code size:      630 (0x0276) bytes ( 0.48%)
+               00565 ;                 315 (0x013b) words
+               00566 ; udata size:       0 (0x0000) bytes ( 0.00%)
+               00567 ; access size:      2 (0x0002) bytes
+               00568 
+               00569 
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE 12
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+FSR1L                             00000FE1
+FSR2L                             00000FD9
+PLUSW2                            00000FDB
+POSTDEC1                          00000FE5
+PREINC1                           00000FE4
+STATUS                            00000FD8
+WREG                              00000FE8
+_00105_DS_                        00000020
+_00107_DS_                        00000034
+_00113_DS_                        0000002A
+_00153_DS_                        00000016
+_00156_DS_                        00000030
+_00158_DS_                        00000046
+_00168_DS_                        0000003C
+_00173_DS_                        00000016
+_00176_DS_                        00000030
+_00178_DS_                        00000046
+_00188_DS_                        0000003C
+_00193_DS_                        0000001E
+_00195_DS_                        00000034
+_00197_DS_                        0000004A
+_00199_DS_                        0000004E
+_00205_DS_                        0000002A
+_ADCON0                           00000000
+_ADCON0bits                       00000000
+_ADCON1                           00000000
+_ADCON1bits                       00000000
+_ADRESH                           00000000
+_ADRESL                           00000000
+_BSR                              00000000
+_CCP1CON                          00000000
+_CCP1CONbits                      00000000
+_CCP2CON                          00000000
+_CCP2CONbits                      00000000
+_CCPR1H                           00000000
+_CCPR1L                           00000000
+_CCPR2H                           00000000
+_CCPR2L                           00000000
+_EEADR                            00000000
+_EECON1                           00000000
+_EECON1bits                       00000000
+_EECON2                           00000000
+_EEDATA                           00000000
+_FSR0H                            00000000
+_FSR0L                            00000000
+_FSR1H                            00000000
+_FSR1L                            00000000
+_FSR2H                            00000000
+_FSR2L                            00000000
+_INDF0                            00000000
+_INDF1                            00000000
+_INDF2                            00000000
+_INTCON                           00000000
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_INTCON2                          00000000
+_INTCON2bits                      00000000
+_INTCON3                          00000000
+_INTCON3bits                      00000000
+_INTCONbits                       00000000
+_IPR1                             00000000
+_IPR1bits                         00000000
+_IPR2                             00000000
+_IPR2bits                         00000000
+_LATA                             00000000
+_LATAbits                         00000000
+_LATB                             00000000
+_LATBbits                         00000000
+_LATC                             00000000
+_LATCbits                         00000000
+_LATD                             00000000
+_LATDbits                         00000000
+_LATE                             00000000
+_LATEbits                         00000000
+_LVDCON                           00000000
+_LVDCONbits                       00000000
+_OSCCON                           00000000
+_OSCCONbits                       00000000
+_PCL                              00000000
+_PCLATH                           00000000
+_PCLATU                           00000000
+_PIE1                             00000000
+_PIE1bits                         00000000
+_PIE2                             00000000
+_PIE2bits                         00000000
+_PIR1                             00000000
+_PIR1bits                         00000000
+_PIR2                             00000000
+_PIR2bits                         00000000
+_PLUSW0                           00000000
+_PLUSW1                           00000000
+_PLUSW2                           00000000
+_PORTA                            00000000
+_PORTAbits                        00000000
+_PORTB                            00000000
+_PORTBbits                        00000000
+_PORTC                            00000000
+_PORTCbits                        00000000
+_PORTD                            00000000
+_PORTDbits                        00000000
+_PORTE                            00000000
+_PORTEbits                        00000000
+_POSTDEC0                         00000000
+_POSTDEC1                         00000000
+_POSTDEC2                         00000000
+_POSTINC0                         00000000
+_POSTINC1                         00000000
+_POSTINC2                         00000000
+_PR2                              00000000
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE 14
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_PREINC0                          00000000
+_PREINC1                          00000000
+_PREINC2                          00000000
+_PRODH                            00000000
+_PRODL                            00000000
+_RCON                             00000000
+_RCONbits                         00000000
+_RCREG                            00000000
+_RCSTA                            00000000
+_RCSTAbits                        00000000
+_SPBRG                            00000000
+_SSPADD                           00000000
+_SSPBUF                           00000000
+_SSPCON1                          00000000
+_SSPCON1bits                      00000000
+_SSPCON2                          00000000
+_SSPCON2bits                      00000000
+_SSPSTAT                          00000000
+_SSPSTATbits                      00000000
+_STATUS                           00000000
+_STATUSbits                       00000000
+_STKPTR                           00000000
+_STKPTRbits                       00000000
+_T0CON                            00000000
+_T0CONbits                        00000000
+_T1CON                            00000000
+_T1CONbits                        00000000
+_T2CON                            00000000
+_T2CONbits                        00000000
+_T3CON                            00000000
+_T3CONbits                        00000000
+_TABLAT                           00000000
+_TBLPTRH                          00000000
+_TBLPTRL                          00000000
+_TBLPTRU                          00000000
+_TMR0H                            00000000
+_TMR0L                            00000000
+_TMR1H                            00000000
+_TMR1L                            00000000
+_TMR2                             00000000
+_TMR3H                            00000000
+_TMR3L                            00000000
+_TOSH                             00000000
+_TOSL                             00000000
+_TOSU                             00000000
+_TRISA                            00000000
+_TRISAbits                        00000000
+_TRISB                            00000000
+_TRISBbits                        00000000
+_TRISC                            00000000
+_TRISCbits                        00000000
+_TRISD                            00000000
+_TRISDbits                        00000000
+_TRISE                            00000000
+gpasm-0.13.7 beta               hd44780.asm 6-9-2010  16:31:23           PAGE 15
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+_TRISEbits                        00000000
+_TXREG                            00000000
+_TXSTA                            00000000
+_TXSTAbits                        00000000
+_WDTCON                           00000000
+_WDTCONbits                       00000000
+_WREG                             00000000
+__18F452                          00000001
+_lcd_busy                         00000000
+_lcd_clear                        00000000
+_lcd_cmode                        00000000
+_lcd_ddram                        00000000
+_lcd_dmode                        00000000
+_lcd_emode                        00000000
+_lcd_fmode                        00000000
+_lcd_home                         00000000
+_lcd_init                         00000000
+_send_cmd                         00000000
+_send_data                        00000000
+r0x00                             00000000
+r0x01                             00000001
+
+
+Errors   :       0
+Warnings :       0 reported,       0 suppressed
+Messages :       0 reported,       0 suppressed
+

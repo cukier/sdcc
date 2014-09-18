@@ -1,0 +1,22 @@
+<!DOCTYPE piklab>
+<piklab>
+  <general>
+    <version>0.1</version>
+    <description/>
+    <device>16F871</device>
+  </general>
+  <assembler>
+    <warning_level>0</warning_level>
+    <includes>
+      <item/>
+    </includes>
+    <custom_options/>
+  </assembler>
+  <linker>
+    <format>inhx32</format>
+    <includes>
+      <item/>
+    </includes>
+    <custom_options/>
+  </linker>
+</piklab>
